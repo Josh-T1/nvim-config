@@ -1,24 +1,26 @@
-return {
-	s(
-	{trig=",f", snippetType="autosnippet"},
-	fmta(
-	[[
-		def <>(<>):
-			"""
-			:
-			:returns
-			"""
-			<>
-		return
-	]],
-	{
-		i(1),
-		i(2),
-		i(3),
-	}
-	)
-	),
+--return {
+--	s(
+--	{trig="ff", snippetType="autosnippet"},
+--	fmta(
+--	[[
+--		def <>(<>):
+--			"""
+--			:
+--			:returns
+--			"""
+--			<>
+--		return
+--	]],
+--	{
+--		i(1),
+--		i(2),
+--		i(3),
+--	}
+--	)
+--	),
+--
+--
+--
+--}
 
-
-
-}
+-- add start of line condition

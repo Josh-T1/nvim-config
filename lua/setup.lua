@@ -1,43 +1,36 @@
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local luasnip = require('luasnip')
+--local snips_path = "/Users/joshuataylor/.config/nvim/Luasnip/tex/math.lua"
+
+--luasnips.loaders.from_lua.load( { paths = snips_path })
+
 vim.opt.completeopt={'menu', 'menuone', 'noselect'}
+--require("../luasnip/tex").lazy_load()
 
 require('telescope').setup{
   defaults = {
-      prompt_prefix = "$ "
-
+    prompt_prefix = "$ ",
 --    mappings = {
 --      i = {
---        -- map actions.which_key to <C-h> (default: <C-/>)
---        -- actions.which_key shows the mappings for your picker,
 --        -- e.g. git_{create, delete, ...}_branch for the git_branches picker
---        ["<C-h>"] = "which_key"
+--        ['<c-a>'] = function() print("hskj") end
 --      }
 --    }
   },
+}
 --  pickers = {
---    -- Default configuration for builtin pickers goes here:
---    -- picker_name = {
---    --   picker_config_key = value,
---    --   ...
---    -- }
---    -- Now the picker_config_key will be applied every time you call this
---    -- builtin picker
 --  },
 --  extensions = {
---    -- Your extension configuration goes here:
---    -- extension_name = {
---    --   extension_config_key = value,
 --    -- }
---    -- please take a look at the readme of the extension you want to configure
 --  }
-}
-
-require'nvim-treesitter.configs'.setup {
+require('telescope').load_extension('fzf')
+-- require('telescope').load_extension('coc')
+require'nvim-treesitter.configs'.setup{
   -- A list of parser names, or "all" (the five listed parsers should always be installed)
-  ensure_installed = { "python", "lua", "latex", "bash", "javascript" },
-
+  ensure_installed = { "python", "lua", "latex", "bash", "javascript", "html" },
   -- Install parsers synchronously (only applied to `ensure_installed`)
   sync_install = false,
+  modules = {},
 
   -- Automatically install missing parsers when entering buffer
   -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
@@ -54,15 +47,14 @@ require'nvim-treesitter.configs'.setup {
 
     -- NOTE: these are the names of the parsers and not the filetype. (for example if you want to
     -- list of language that will be disabled
-    disable = {"latex"},
-    -- Or use a function for more flexibility, e.g. to disable slow treesitter highlight for large files
-    disable = function(lang, buf)
-        local max_filesize = 100 * 1024 -- 100 KB
-        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-        if ok and stats and stats.size > max_filesize then
-            return true
-        end
-    end,
+    disable = {"latex", "vimdoc"},
+--    disable = function(lang, buf)
+--        local max_filesize = 100 * 1024 -- 100 KB
+--        local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+--        if ok and stats and stats.size > max_filesize then
+--            return true
+--        end
+--    end,
 
     additional_vim_regex_highlighting = false,
   },
@@ -81,44 +73,101 @@ require'lspconfig'.pyright.setup{
   end
 }
 
+require'lspconfig'.html.setup{
+  capabilities = capabilities,
+}
 
+require'lspconfig'.lua_ls.setup{
+  on_attach = function()
+  vim.keymap.set("n", "I", vim.lsp.buf.hover, {buffer=0})
+  vim.keymap.set("n", "gd", vim.lsp.buf.definition, {buffer=0})
+  end,
+  settings = {
+    Lua = {
+      diagnostics = {
+        globals = {'vim'},
+      },
+
+      workspace = {
+        --library = vim.api.nvim_get_runtime_file("", true),
+        library = vim.fn.expand("~/.config"),
+        ignoreDir = {
+          ".git",
+          "node_modules",
+          "build"
+        }
+      },
+
+      telemetry = {
+        enable = false,
+      }
+
+    },
+
+  }
+}
+
+
+
+vim.diagnostic.config({signs = false})
 
 local cmp = require'cmp'
 
-  cmp.setup({
-    snippet = {
-      expand = function(args)
-        require('luasnip').lsp_expand(args.body)
-      end
-    },
-    window = {
-      -- completion = cmp.config.window.bordered(),
-      -- documentation = cmp.config.window.bordered(),
-    },
-    mapping = cmp.mapping.preset.insert({
-      ['<C-b>'] = cmp.mapping.scroll_docs(-4),
-      ['<C-f>'] = cmp.mapping.scroll_docs(4),
-      ['<C-Space>'] = cmp.mapping.complete(),
-      ['<C-e>'] = cmp.mapping.abort(),
-      ['<CR>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-    }),
-    sources = cmp.config.sources({
-      { name = 'nvim_lsp' },
-      { name = 'luasnip' }, -- For luasnip users.
-    }, {
-      { name = 'buffer' },
-    })
-  })
+cmp.setup({
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body) --luasnip users
+    end,
+  },
+  window = {
+     completion = cmp.config.window.bordered(),
+     documentation = cmp.config.window.bordered(),
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-b>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.abort(),
+    ['<Tab>'] = cmp.mapping.confirm({ select = true }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
+  }),
+  formatting = {
+    fields = { "kind", "abbr", "menu" },
+    format = function(entry, vim_item)
+--      vim_item.kind = string.format('%s %s', kind_icons[vim_item.kind], vim_item.kind)
+      vim_item.menu = ({ -- Order matters
+        luasnip = "[Snippet]",
+        buffer = "[Buffer]",
+        path = "[Path]",
+      })[entry.source.name]
+      return vim_item
+    end,
+  },
+  sources = cmp.config.sources({
+    { name = 'nvim_lsp' },
+    { name = 'luasnip' }, -- For luasnip users.
+  }, {
+    { name = 'buffer' },
+  }),
+})
 
-  -- Set configuration for specific filetype.
-  cmp.setup.filetype('gitcommit', {
-    sources = cmp.config.sources({
-      { name = 'git' }, -- You can specify the `git` source if [you were installed it](https://github.com/petertriho/cmp-git).
-    }, {
-      { name = 'buffer' },
-    })
+-- Set configuration for specific filetype.
+cmp.setup.filetype('gitcommit', {
+  sources = cmp.config.sources({
+    { name = 'git' }, -- You can specify the `git` source if [you were installed it](https://github.com/petertriho/cmp-git).
+  }, {
+    { name = 'buffer' },
   })
+})
 
+-- Disable autocomplete for filetype tex
+--cmp.setup.filetype("tex", {
+--  sources = cmp.config.sources({
+--    { name = 'nvim_lsp' },
+--    { name = 'luasnip' },
+--    {
+--    { name = 'buffer' }
+--  }})
+--})
   -- Use buffer source for `/` and `?` (if you enabled `native_menu`, this won't work anymore).
 --  cmp.setup.cmdline({ '/', '?' }, {
 --    mapping = cmp.mapping.preset.cmdline(),
@@ -139,5 +188,31 @@ local cmp = require'cmp'
 
 --}
 
+
+local mappings = {
+
+}
+local telescope = require('telescope.builtin')
+
+mappings.curr_buf = function()
+  local opts = require('telescope.themes').get_ivy()
+  telescope.current_buffer_fuzzy_find(opts)
+end
+-- can i use if statements are argument to change functionality, should I?
+mappings.grep_code_notes = function()
+  telescope.live_grep {
+    cwd="~/documents/notes/code/",
+    prompt_title = "Cmpsci Notes",
+    preview_cutoff = 1,
+    layout_strategy = "horizontal",
+    layout_config = {
+      height = 0.80,
+      width = 0.95,
+    }
+  }
+end
+
+
+return mappings
 
 
