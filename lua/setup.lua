@@ -1,13 +1,24 @@
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local luasnip = require('luasnip')
---local snips_path = "/Users/joshuataylor/.config/nvim/Luasnip/tex/math.lua"
+local cmp = require('cmp')
+local lspconfig = require('lspconfig')
+local telescope = require('telescope')
+local telescope_builtin = require('telescope.builtin')
 
---luasnips.loaders.from_lua.load( { paths = snips_path })
-
+-- === General Config ===
 vim.opt.completeopt={'menu', 'menuone', 'noselect'}
---require("../luasnip/tex").lazy_load()
+vim.diagnostic.config({signs = false})
 
-require('telescope').setup{
+-- === Luasnip Setup ===
+luasnip.config.set_config({
+  enable_autosnippets = true,
+  store_selection_keys = "<Tab>",
+})
+
+
+-- === Telescope Setup === 
+telescope.load_extension('fzf')
+telescope.setup{
   defaults = {
     prompt_prefix = "$ ",
 --    mappings = {
@@ -23,8 +34,8 @@ require('telescope').setup{
 --  extensions = {
 --    -- }
 --  }
-require('telescope').load_extension('fzf')
--- require('telescope').load_extension('coc')
+
+-- === Treesitter Setup ===
 require'nvim-treesitter.configs'.setup{
   -- A list of parser names, or "all" (the five listed parsers should always be installed)
   ensure_installed = { "python", "lua", "latex", "bash", "javascript", "html" },
@@ -60,7 +71,8 @@ require'nvim-treesitter.configs'.setup{
   },
 }
 
-require'lspconfig'.pyright.setup{
+-- === Lspconfig Setup === 
+lspconfig.pyright.setup{
   capabilities = capabilities,
   on_attach = function()
   vim.keymap.set("n", "I", vim.lsp.buf.hover, {buffer=0})
@@ -73,11 +85,11 @@ require'lspconfig'.pyright.setup{
   end
 }
 
-require'lspconfig'.html.setup{
+lspconfig.html.setup{
   capabilities = capabilities,
 }
 
-require'lspconfig'.lua_ls.setup{
+lspconfig.lua_ls.setup{
   on_attach = function()
   vim.keymap.set("n", "I", vim.lsp.buf.hover, {buffer=0})
   vim.keymap.set("n", "gd", vim.lsp.buf.definition, {buffer=0})
@@ -109,10 +121,10 @@ require'lspconfig'.lua_ls.setup{
 
 
 
-vim.diagnostic.config({signs = false})
 
-local cmp = require'cmp'
 
+
+--- === Cmp Setup ===
 cmp.setup({
   snippet = {
     expand = function(args)
@@ -188,19 +200,18 @@ cmp.setup.filetype('gitcommit', {
 
 --}
 
-
+--- === Set module functions ===
 local mappings = {
 
 }
-local telescope = require('telescope.builtin')
 
 mappings.curr_buf = function()
   local opts = require('telescope.themes').get_ivy()
-  telescope.current_buffer_fuzzy_find(opts)
+  telescope_builtin.current_buffer_fuzzy_find(opts)
 end
--- can i use if statements are argument to change functionality, should I?
+
 mappings.grep_code_notes = function()
-  telescope.live_grep {
+  telescope_builtin.live_grep {
     cwd="~/documents/notes/code/",
     prompt_title = "Cmpsci Notes",
     preview_cutoff = 1,

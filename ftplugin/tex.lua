@@ -1,4 +1,9 @@
-package.path = package.path .. ";/Users/joshuataylor/.config/nvim/lua/?.lua"
+require('luasnip.loaders.from_lua').lazy_load({
+ paths = {vim.fn.expand("~/.config/nvim/Luasnip/tex/")},
+})
+
+package.path = package.path .. ";" .. vim.fn.expand("~/.config/nvim/lua/?.lua")
+
 local luasnip_helpers = require("luasnip_helpers")
 local tools = require("tools")
 local luasnip = require("luasnip")
@@ -24,20 +29,14 @@ vim.g.vimtex_compiler_latexmk = {
         }
 vim.g.tex_flavor = 'latex'
 setlocal.conceallevel = 0
-vim.g.tex_conceal='abdmg'
+vim.g.tex_conceal = 'abdmg'
 vim.g.maplocalleader = ","
--- hi clear Conceal
 
--- nmap <localleader>l <plug>(vimtex-view)
-vim.keymap.set('n', "<localleader>l", "<Cmd>VimtexCompile<cr>")
--- inoremap <localleader>cc <Cmd>VimtexCompile<cr>
--- spell autocorrect shortcur
-vim.keymap.set('i', "<localleader>q", "<c-g>u<Esc>[s1z=`]a<c-g>u")
-vim.keymap.set('n', "<localleader>q", "<c-g>u<Esc>[s1z=`]a<c-g>u")
--- inoremap <localleader>q <c-g>u<Esc>[s1z=`]a<c-g>u
--- noremap <localleader>q <c-g>u<Esc>[s1z=`]a<c-g>u
--- figure script shortcuts
--- Would be cool to add cmd dependent on operating system
+--------------------------------------------------------
+--              KeyMaps                               --
+--------------------------------------------------------
+vim.keymap.set('n', "<localleader>c", "<Cmd>VimtexCompile<cr>")
+
 
 --------------------------------------------------------
 --              MathNote                              --
@@ -57,7 +56,7 @@ end
 local function get_logging_path()
   -- Returns logging path or /dev/null
   -- I should add better error handling and implement logging
-  local filename = "/Users/joshuataylor/documents/python/myprojects/mathnote/config.json"
+  local filename = vim.fn.expand("~/documents/python/myprojects/mathnote/config.json")
   local contents = read_file(filename)
   if contents ~= nil then
     local json = vim.fn.json_decode(contents)
@@ -73,7 +72,7 @@ end
 
 
 local function GetArgs(arg)
-  local python_path = "/Users/joshuataylor/documents/python/myprojects/mathnote/shortcut_manager/initializer.py"
+  local python_path = vim.fn.expand("~/documents/python/myprojects/mathnote/shortcut_manager/initializer.py")
   local line = vim.fn.getline('.')
   local path = vim.b.vimtex.root .. '/figures/'
   local error_redirct_path = get_logging_path()

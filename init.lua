@@ -43,44 +43,37 @@ vim.cmd('syntax on')
 -- molokai
 vim.cmd('colorscheme catppuccin')
 
--- Luasnip config
-local luasnip = require('luasnip')
-luasnip.config.set_config({
-  enable_autosnippets = true,
-  store_selection_keys = "<Tab>",
-})
 
---- TODO add the following to each file type ftplugin with the respective plugin file/dir
---require('luasnip.loaders.from_lua').lazy_load({
--- paths = {vim.fn.expand("~/.config/nvim/Luasnip/")},
---})
---oim.api.nvim_create_autocmd("FileType")
 local setup = require("setup")
-local set = vim.opt
+
+
+--------------------------------------------------------
+--              Global Options                        --
+--------------------------------------------------------
 
 -- sets numbers on left side of screen
-set.number = true
+vim.opt.number = true
 -- default split direction for new buffer
-set.splitright = true
+vim.opt.splitright = true
 -- Prevent text from wrapping
-set.wrap = false
--- setting invisible character representations
-set.listchars = {trail = '~'}
+vim.opt.wrap = false
+-- vim.optting invisible character representations
+vim.opt.listchars = {trail = '~'}
 -- vim highlights text that will be subsituted but does not split window to preview
-set.inccommand = 'nosplit'
+vim.opt.inccommand = 'nosplit'
 -- mouse support in 'a'll modes
-set.mouse = 'a'
+vim.opt.mouse = 'a'
 -- enables highlight for partial matches on search
-set.hlsearch = true
-set.tabstop = 4
-set.softtabstop = 4
-set.shiftwidth = 4
+vim.opt.hlsearch = true
+vim.opt.tabstop = 4
+vim.opt.softtabstop = 4
+vim.opt.shiftwidth = 4
 -- vim inserts space characters in-place of tab character
-set.expandtab = true
+vim.opt.expandtab = true
 -- highlights matching bracket
-set.showmatch = true
+vim.opt.showmatch = true
 -- case insensitive when all lower case letters are searched, case sensitive in capital letter present
-set.smartcase = true
+vim.opt.smartcase = true
 
 -- spell autocorrect shortcur
 vim.keymap.set('i', "<localleader>q", "<c-g>u<Esc>[s1z=`]a<c-g>u")
@@ -92,11 +85,7 @@ vim.api.nvim_create_autocmd('BufWritePre',{
   command = ":%s/\\s\\+$//e"
 })
 
--- Disables tree stter higlighting for the buffer, NESSESARY???
---vim.api.nvim_create_autocmd('BufEnter',{
---  pattern = "*.tex",
---  command = ":TSBufDisable highlight"
--- })
+
 
 vim.g.python3_host_prog = vim.fn.expand('~/.pyenv/versions/py3nvim/bin/python')
 vim.g.python_host_prog = vim.fn.expand('~/.pyenv/versions/py3nvim/bin/python')
@@ -139,3 +128,6 @@ vim.api.nvim_create_user_command("ReloadConfig", function()
   vim.notify("Sourced init.lua", {title = "Nvim"})
 end, {})
 vim.keymap.set("n", 'so', "<Cmd>ReloadConfig<cr>")
+
+-- Markdown
+vim.api.nvim_create_augroup("MarkdownSettings", {clear = true})
