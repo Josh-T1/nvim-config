@@ -1,11 +1,13 @@
 local M = {}
 
 local ls = require("luasnip")
+local tools = require("tools")
 local sn = ls.snippet_node
 local i = ls.insert_node
 local r = ls.restore_node
 local t = ls.text_node
 local f = ls.function_node
+
 
 function M.get_visuals(args, parents)
 	if (#parents.snippet.env.LS_SELECT_RAW > 0) then
@@ -43,15 +45,18 @@ end
 
 
 -- Dynamically create matrix using luasnip
-function M.mat(args, snip)
-  local rows = tonumber(snip.captures[1]) -- These two lines are dependent on snippet
-  local cols = tonumber(snip.captures[2])
-  local dots = string.find(snip.captures[3], "dt") -- make sure valid size
+-- @param n Integer: number of columns as string
+-- @param m Interger: number of rows as string
+-- @param dots Bool: If true only insert nodes will be diagonals, off diagals
+function M.mat(m, n, dots)
+  local rows = tonumber(m)
+  local cols = tonumber(n)
+  --local dots = string.find(snip.captures[3], "dt") -- make sure valid size
   local nodes = {}
   local insert_index = 1
 
   for j = 1, rows do
-    if dots ~= nil and j ~= 1 and j ~= rows then
+    if dots ~= nil and j ~= 1 and j ~= rows then -- check to see if we are on matrix boundry
       table.insert(nodes, t(""))
     else
       table.insert(nodes, i(insert_index))
@@ -82,13 +87,15 @@ function M.mat(args, snip)
   return sn(nil, nodes)
 end
 
--- Used in matrix snippet to determine if type pmatrix....ect
-function M.matrix_type(_, snip)
-  if snip.captures[3] == nil then
+-- Used in matrix snippet to determine matrix type. e.g pmatrix
+-- @param m_type: type of matrix
+-- @returns: type as string
+function M.matrix_type(m_type)
+  if m_type == nil then
     return "pmatrix"
   end
 
-  local res = snip.captures[3]:gsub("adt", ""):gsub("dt", "")
+  local res = m_type:gsub("adt", ""):gsub("dt", "")
 
   if res ~= "" and res ~= "a" and res ~= "r" then
     return res .. "matrix"
@@ -97,5 +104,72 @@ function M.matrix_type(_, snip)
   end
 end
 
-return M
 
+-- Looks at line that cursor is on. Finds the first closing bracket that has no matching opening bracket in a position after the cursor, 
+-- and sets cursor to the position of the character after the closing bracket
+function M.move_cursor_outside_bracket()
+  local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+
+  local line = vim.api.nvim_buf_get_lines(0, row - 1, row, false)[1]
+  if not line or #line < (col + 1) then
+    return false
+  else
+    line = string.sub(line, col, #line + 1)
+  end
+
+  --vim.api.nvim_notify("teset")
+  local closing_index = nil
+  local braces = {['('] = ")"}
+-- {closing bracket = matching opening bracket seen}
+  local closing_braces = {[")"] = false}
+
+  for index, char in tools.enumerate(string.sub(line, 2, #line + 1)) do
+    if braces[char] ~= nil then
+      closing_braces[braces[char]] = not closing_braces[braces[char]]
+    end
+    -- no matching opening bracket has been seen, move cursor to index + 1
+    -- the second condition of checking backslash is only relavent to tex files... need to fix this
+    if closing_braces[char] == false and string.sub(line, index, index) ~= '\\' then
+      closing_index = index + col
+      break
+    -- matching brace has been seen, reset as this is now a proper open/close pair
+    elseif closing_braces[char] == true then
+      closing_braces[char] = false
+    end
+  end
+
+  if closing_index then
+      vim.api.nvim_win_set_cursor(0, {row, closing_index})
+  end
+  return closing_index ~= nil
+end
+
+-- Gets preceding character at -index. Current char is index 0
+-- If index is out of range nil is returned
+-- @param index Integer: get preceeding char at -index
+-- @returns String | nil
+function M.prev_char(index)
+  local line = vim.api.nvim_get_current_line()
+  local col = vim.api.nvim_win_get_cursor(0)[2]
+  if col > index then
+      return line:sub(col - index, col - index)
+  end
+  return nil
+end
+
+function M.pop_prev_char(index)
+  local line = vim.api.nvim_get_current_line()
+  local pos = vim.api.nvim_win_get_cursor(0)
+  local col = pos[2]
+  local row = pos[1]
+  if col > index then
+      local new_line = line:sub(1, col - index - 1) .. line:sub(col - index + 1)
+      local buf = vim.api.nvim_get_current_buf()
+      vim.api.nvim_buf_set_lines(buf, row - 1, row, false, {new_line})
+      vim.api.nvim_win_set_cursor(0, {row, col + 2})
+      return line:sub(col - index, col - index)
+  end
+  return nil
+end
+
+return M

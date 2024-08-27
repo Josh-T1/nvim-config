@@ -1,14 +1,14 @@
 -- set to 1 to automatically start the preview when opening a Markdown file. 0 to disable
-vim.g.mkdp_auto_start = 1
+vim.g.mkdp_auto_start = 0
 -- set to 1 to automatilly close live preview when changing from markdown buffer to a non markdown buffer. 0 to disable
-vim.g.mkdp_auto_close = 1
+vim.g.mkdp_auto_close = 0
 -- Set to 1 to enable refresh whenever the buffer is saved. 0 to disable
 vim.mkdp_refresh_slow = 0
 -- formatting display of file name
 
 vim.g.mkdp_page_title = '「${name}」'
 
-vim.g.mkdp_filetypes = { 'markdown' }
+vim.g.mkdp_filetypes = {'markdown'}
 
 -- support for math region
 vim.g.vim_markdown_math = 1

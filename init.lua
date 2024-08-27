@@ -1,12 +1,12 @@
-vim.g.lua_host_prog = "/usr/local/bin/lua5.4"
+vim.g.lua_host_prog = "/opt/bin/lua5.4"
+
 local Plug = vim.fn['plug#']
 vim.call('plug#begin')
 -- my Plug
-Plug '~/.config/nvim/plugged/converter'
 -- My plug for adding brackets
-Plug '~/.config/nvim/plugged/saround'
+Plug '~/.config/nvim/myplugins/saround'
 -- my plug for commenting lines out
-Plug '~/.config/nvim/plugged/CommentOut'
+Plug '~/.config/nvim/myplugins/CommentOut'
 -- Latex plug for previewing
 Plug 'lervag/vimtex'
 -- Luasnip plug for code snippets
@@ -18,7 +18,7 @@ Plug 'tomasr/molokai'
 Plug('dracula/vim', {as = 'dracula'})
 Plug('catppuccin/nvim', { as = 'catppuccin' })
 --Markdown plug to preview .md
-Plug 'iamcco/markdown-preview.nvim'
+Plug ('iamcco/markdown-preview.nvim',{ ['do'] = 'cd app && npx --yes yarn install' })
 -- Lsp/Autocomplete
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/nvim-cmp'
@@ -75,9 +75,8 @@ vim.opt.showmatch = true
 -- case insensitive when all lower case letters are searched, case sensitive in capital letter present
 vim.opt.smartcase = true
 
--- spell autocorrect shortcur
-vim.keymap.set('i', "<localleader>q", "<c-g>u<Esc>[s1z=`]a<c-g>u")
-vim.keymap.set('n', "<localleader>q", "<c-g>u<Esc>[s1z=`]a<c-g>u")
+
+
 
 -- Remove tailing whitespace from python files
 vim.api.nvim_create_autocmd('BufWritePre',{
@@ -86,14 +85,17 @@ vim.api.nvim_create_autocmd('BufWritePre',{
 })
 
 
-
-vim.g.python3_host_prog = vim.fn.expand('~/.pyenv/versions/py3nvim/bin/python')
-vim.g.python_host_prog = vim.fn.expand('~/.pyenv/versions/py3nvim/bin/python')
+vim.g.python3_host_prog = vim.fn.exepath("python3")
+vim.g.python_host_prog = vim.fn.exepath("python3")
 -- My plug mappings
 vim.g.saround_square_key_user = "sss"
 vim.g.saround_curly_key_user = "ssc"
 vim.g.saround_round_key_user = "ssr"
 vim.g.mapleader = ','
+
+-- spell autocorrect shortcur
+vim.keymap.set('i', "<leader>q", "<c-g>u<Esc>[s1z=`]a<c-g>u")
+vim.keymap.set('n', "<leader>q", "<c-g>u<Esc>[s1z=`]a<c-g>u")
 -- go to file
 vim.keymap.set('n', 'gf', function()
   setup.curr_buf()
@@ -130,4 +132,89 @@ end, {})
 vim.keymap.set("n", 'so', "<Cmd>ReloadConfig<cr>")
 
 -- Markdown
-vim.api.nvim_create_augroup("MarkdownSettings", {clear = true})
+vim.api.nvim_create_augroup("MarkdownFileTypeKeymaps", {clear = true})
+vim.api.nvim_create_augroup("TexFileTypeKeymaps", {clear = true})
+
+
+-------------------------------------------------------------
+---                        LuaSnip                        ---
+-------------------------------------------------------------
+local luasnip_helpers = require("luasnip_helpers")
+local tools = require("tools")
+local luasnip = require("luasnip")
+require('luasnip.loaders.from_lua').lazy_load({
+ paths = {vim.fn.expand("~/.config/nvim/Luasnip")},
+})
+
+local function set_tex_keymaps()
+  -- Luasnip jump keymaps
+  vim.keymap.set('i', '/', function()
+    vim.api.nvim_echo({{"Invalid dir", "Normal"}}, false, {})
+    local res = luasnip_helpers.move_cursor_outside_bracket()
+    if res == false and luasnip.jumpable(1) then
+      luasnip.jump(1)
+    elseif res == false then
+      local key = vim.api.nvim_replace_termcodes("/", true, true, true)
+      vim.api.nvim_feedkeys(key, 'n', false)
+    end
+  end, {expr = false, silent = true, buffer = true}
+    )
+
+  vim.keymap.set('i', "<C-/>", function()
+
+    local res = luasnip_helpers.move_cursor_outside_bracket()
+    if res == false and luasnip.jumpable(-1) then
+        luasnip.jump(-1)
+    end
+  end, {expr = false, silent = true, buffer = true}
+    )
+  -- Vector graphics keymap
+  vim.keymap.set("i", "<C-v>", function()
+--    vim.api.nvim_echo({{"Invalid dir", "Normal"}}, false, {})
+
+    local line = vim.fn.getline('.')
+    local dir_path = vim.b.vimtex.root .. '/figures/'
+    if not tools.dir_exists(dir_path) then
+--      vim.api.nvim_feedkeys("a", "insert", false)
+      return
+    end
+    local path = dir_path .. line
+    local new_path = path
+    local attempts = 0
+
+    while attempts < 3 and tools.file_exists(new_path) do
+      attempts  = attempts + 1
+      new_path = path .. tostring(attempts)
+    end
+
+    if not tools.file_exists(new_path) then
+      local tex = [[
+\begin{figure}[ht]
+    \centering
+    \includegraphics[width=\textwidth]{}
+\end{figure}]]
+      local bufrn = vim.api.nvim_get_current_buf()
+      vim.fn.system("veditor -f " .. new_path)
+      tools.remove_line_and_insert_text(bufrn, tex)
+    end
+  end)
+end
+
+
+local function set_markdown_keymaps()
+  vim.keymap.set('n', '<LocalLeader>cc', '<Plug>MarkdownPreview', { noremap = true, silent = true })
+  vim.keymap.set('i', '<LocalLeader>cc', '<Esc><Plug>MarkdownPreview', { noremap = true, silent = true })
+  vim.keymap.set('n', '<LocalLeader>s', '<Plug>MarkdownPreviewStop', { noremap = true, silent = true })
+  vim.keymap.set('n', '<LocalLeader>c', '<Plug>MarkdownPreviewToggle', { noremap = true, silent = true })
+end
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "md",
+  callback = set_markdown_keymaps,
+  group = "MarkdownFileTypeKeymaps"
+})
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "tex",
+    callback = set_tex_keymaps,
+    group = "TexFileTypeKeymaps"
+})
