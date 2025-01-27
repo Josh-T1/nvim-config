@@ -75,3 +75,11 @@ To match any of the following prefix with `%`
 
 1. Figure out how to center equation in middle of page
 1. For sums and products create individual snippets, then include easy methods for creating limitss
+
+
+# Fix 
+1. N does not add \\
+1. Capital letters expand at the start of lines and inside braces for
+some reason
+1. change setminus expansion
+

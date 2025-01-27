@@ -13,12 +13,51 @@ local mat = helpers.mat
 local matrix_type = helpers.matrix_type
 local d = ls.dynamic_node
 return{
+
+  s(
+  { trig="m%*", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {
+    t("\\mu^{*}("), i(1), t(")"),i(0)
+    },
+  {condition = mathzone}
+  ),
+  
+  s(
+  { trig="'", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {
+    t("\\prime")
+    },
+  {condition = mathzone}
+  ),
+  s(
+  {trig="([^%a])du", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {
+    f( function(_, snip) return snip.captures[1] end ),
+    t("_{"), i(1), t("}^{"), i(2), t("}"), i(0)
+  },
+  {condition = mathzone}
+	),
+  
+  s(
+  {trig="Hom", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {
+    t("\\text{Hom}_C("), i(1), t(")")
+  },
+  {condition = mathzone}
+	),
+
   s(
   {trig="rb", snippetType="autosnippet"},
   {t("\\roundbk{"), i(1), t("}"), i(0)},
   {condition = mathzone}
   ), 
-
+  
+  s(
+  {trig="^", snippetType="autosnippet"},
+  {t("\\stackrel{"), i(1), t("}{"), i(2),t("}") , i(0)},
+  {condition = mathzone}
+  ), 
+  
   s(
   {trig="cb", snippetType="autosnippet"},
   {t("\\curlybk{"), i(1), t("}"), i(0)},
@@ -33,34 +72,23 @@ return{
   s(
   { trig="([^%a])lim", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip) return snip.captures[1] end),
     t("\\mlim{"), i(1), t("\\to"), i(2), t("}"), i(0)
     },
   {condition = mathzone}
   ),
 
-  s(
-  { trig="([^%a])blim", wordTrig=false, regTrig=true, snippetType="autosnippet"},
-  {
-    f( function(_, snip) return snip.captures[1] end ),
-    t("\\limits_{"), i(1), t("}"), i(0)
-    },
-  {condition = mathzone}
-  ),
 
   s(
-  { trig="([^%a])nlim", wordTrig=false, regTrig=true, snippetType="autosnippet"},
-  { 
-    f( function(_, snip) return snip.captures[1] end ),
-    t("\\mlim{n\\to\\infty}")
-    },
-  {condition = mathzone}
-  ),
-
-  s(
-  {trig="([^%a])fn",wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)fn",wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("f_{n}")
   },
     {condition = mathzone}
@@ -84,7 +112,7 @@ return{
   {condition = mathzone}
     ),
     s(
-    {trig = "([%a]*)mat(%d)(%d)", regTrig = true, name = "matrix", dscr = "matrix trigger", snippetType= "autosnippet"},
+    {trig = "([%a]*)mat([%d])([%d])", regTrig = true, name = "matrix", dscr = "matrix trigger", snippetType= "autosnippet"},
     fmt([[
     \begin{<>}<>
     <>
@@ -165,7 +193,9 @@ return{
   ),
  
   s(
-  {trig="(.?)%?",wordTrig=false, regTrig=true, snippetType="autosnippet", description="limits"},
+  {trig="(.?)%?",wordTrig=false, regTrig=true, snippetType="autosnippet", 
+  description="limit snippet. Optional prefix flags [i|u|b] "
+  },
   fmt([[<>]],
   {
     d(1, function(args, snip)
@@ -177,14 +207,17 @@ return{
 
       if snip.captures[1] == "i" then
         table.insert(nodes, t("\\limits_{n=1}^{\\infty}"))
+
       elseif snip.captures[1] == "d" then
         table.insert(nodes, t("\\limits_{"))
         table.insert(nodes, i(1))
         table.insert(nodes, t("}"))
+
       elseif snip.captures[1] == "u" then
         table.insert(nodes, t("\\limits^{"))
         table.insert(nodes, i(1))
         table.insert(nodes, t("}"))
+
       else
         table.insert(nodes, t(last_char .. "\\limits_{"))
         table.insert(nodes, i(1))
@@ -250,9 +283,15 @@ return{
 
 
   s(
-  {trig="([^%a])([%a])%.%.",wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)([%a])%.%.",wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     f( function(_, snip) return snip.captures[2] end ), t("_1, \\dots, "),
     f( function(_, snip) return snip.captures[2] end ), t("_n")
     },
@@ -316,64 +355,120 @@ return{
   ),	
 
   s(
-  {trig="([^%a])null", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)null", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-  f( function(_, snip) return snip.captures[1] end ),
-  t("\\operatorname{null}"),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
+    t("\\operatorname{null}"),
   },
   {condition = mathzone}
   ),	
 
 
   s(
-  {trig="([^%a])nullity", snippetType="autosnippet"},
+  {trig="([^%a]?)nullity", snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\text{nullity}")
   },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])rank", snippetType="autosnippet"},
+  {trig="([^%a]?)rank", snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\text{rank}")
   },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])inv", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)inv", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("^{-1}")
     },
     {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])sinv", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)sinv", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("^\\dagger ")
   },
     {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])bar", wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)bar", wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\overline{"), i(1), t("}"), i(0)
     },
     {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])tilde", wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)hat", wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
+    t("\\hat{"), i(1), t("}"), i(0)
+    },
+    {condition = mathzone}
+  ),
+  s(
+  {trig="([^%a]?)tilde", wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\tilde{"), i(1), t("}"), i(0)
     },
     {condition = mathzone}
@@ -390,48 +485,45 @@ return{
   ),
  --- TODO
  s(
- {trig="([%a])seq", snippetType="autosnippet"}, 
+ {trig="([%a])seq",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
  { t("\\curlybk{"),
   f( function(_, snip) return snip.captures[1] end ),
-  t("_n}_{n \\in \\mathbb{N}}")}
+  t("_n}_{n \\in \\mathbb{N}}")},
+  {condition = mathzone}
+ ),
+ 
+ s(
+ {trig="bold",wordTrig=true, snippetType="autosnippet"},
+ { t("\\boldsymbol{\\mathit{"), i(1), t("}}")}
  ),
 
-  s(
-  {trig="([%u])", wordTrig=false, regTrig=true, snippetType="autosnippet",
-  desription="captilize all upper case letters"},
-  {
-    t("\\("),
-    f( function(_, snip) return snip.captures[1] end ), t("\\)")
-    },
-    {condition = function()
-      -- Returns true when: 1. in mathzone, 2. Previous chars do not have the pattern "[%a]%.[%s]"
-        local math_zone = mathzone()
-        if math_zone then
-          return false
-        end
-        local prev_char_1 = helpers.prev_char(1)
-        local prev_char_2 = helpers.prev_char(2)
-        local prev_char_3 = helpers.prev_char(3)
-        -- Start of line -> false
-        if prev_char_1 == nil then
-          return false
-        end
-        -- Preceeding letters are used to expand other snippets when char is upper case
-        if prev_char_1:match("%a") then
-            return false
-        end
-        if prev_char_2 == nil or prev_char_3 == nil then
-          return true
-        end
-        -- Matches new sentence
-        if prev_char_1:match("%s") and prev_char_2:match("%.") and prev_char_3:match("%a") then
-          return false
-        end
-
-        return true
-
-    end
-    }
-  ),
+--  s(
+--  {trig="([%u])", wordTrig=false, regTrig=true, snippetType="autosnippet",
+--  desription="captilize all upper case letters"},
+--  {
+--    t("\\("),
+--    f( function(_, snip) return snip.captures[1] end ), t("\\)")
+--    },
+--    {condition = function()
+--      -- Returns true when: 1. in mathzone, 2. Previous chars do not have the pattern "[%a]%.[%s]"
+--        local math_zone = mathzone()
+--        if math_zone then
+--          return false
+--        end
+--        local prev_char_1 = helpers.prev_char(1)
+--        -- Start of line -> false
+--        if prev_char_1 == nil then
+--          return false
+--        end
+--        -- Preceeding letters are used to expand other snippets when char is upper case
+--        if not prev_char_1:match("%s") or prev_char_1:match("%.") then
+--            return false
+--        end
+--
+--        return true
+--
+--    end
+--    }
+--  ),
 
 }

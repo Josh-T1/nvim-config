@@ -3,9 +3,9 @@ vim.g.lua_host_prog = "/opt/bin/lua5.4"
 local Plug = vim.fn['plug#']
 vim.call('plug#begin')
 -- my Plug
--- My plug for adding brackets
+-- My plugin for adding brackets
 Plug '~/.config/nvim/myplugins/saround'
--- my plug for commenting lines out
+-- my plugin for commenting lines out using visual selection
 Plug '~/.config/nvim/myplugins/CommentOut'
 -- Latex plug for previewing
 Plug 'lervag/vimtex'
@@ -76,8 +76,6 @@ vim.opt.showmatch = true
 vim.opt.smartcase = true
 
 
-
-
 -- Remove tailing whitespace from python files
 vim.api.nvim_create_autocmd('BufWritePre',{
   pattern = "*.py",
@@ -103,7 +101,7 @@ end)
 
 vim.keymap.set('n', 'gb', '<Cmd>Telescope buffers<cr>')
 -- grep notes
-vim.keymap.set('c', 'gb', '<Cmd>setup.grep_code_notes()<cr>')
+--vim.keymap.set('c', 'gb', '<Cmd>setup.grep_code_notes()<cr>')
 
 vim.keymap.set('n', 'fl', '<Cmd>Telescope find_files<cr>')
 vim.keymap.set('n', 'fg', '<Cmd>Telescope find_files cwd=~/<cr>')
@@ -168,7 +166,7 @@ local function set_tex_keymaps()
     end
   end, {expr = false, silent = true, buffer = true}
     )
-  -- Vector graphics keymap
+  -- SvgTex keymap 
   vim.keymap.set("i", "<C-v>", function()
 --    vim.api.nvim_echo({{"Invalid dir", "Normal"}}, false, {})
 
@@ -199,6 +197,24 @@ local function set_tex_keymaps()
     end
   end)
 end
+
+
+-------------------------------------------------------------
+---                        VimTex                         ---
+-------------------------------------------------------------
+vim.g.vimtex_view_method='skim'
+vim.g.vimtex_view_general_viewer='/Applications/Skim.app/Contents/SharedSupport/displayline'
+vim.g.vimtex_view_general_options='-r @line @pdf @tex'
+-- %:h returns directory containing file being compiled
+ vim.g.vimtex_quickfix_mode = 1
+--vim.g.vimtex_compiler_method = 'pdflatex'
+vim.g.vimtex_compiler_latexmk = {
+            executable =  'latexmk',
+            options = {
+             '-interaction=nonstopmode',
+--             '-aux-directory=' .. vim.fn.expand('%:h') .. '/_aux_files',
+            },
+        }
 
 
 local function set_markdown_keymaps()

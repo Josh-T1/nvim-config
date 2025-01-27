@@ -12,18 +12,32 @@ local fmta = ls.fmta
 
 return{
   s(
-  { trig="([^%a])max", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  { trig="([^%a]?)max", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   { 
-    f( function(_, snip) return snip.captures[1] end ),
-    t("\\max")
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
+    t("\\max\\{"),
+    i(1),
+    t("\\}")
     },
   {condition = mathzone}
   ),
 
   s(
-  { trig="([^%a])min", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  { trig="([^%a]?)min", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   { 
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\min")
     },
   {condition = mathzone}
@@ -37,10 +51,27 @@ return{
   {condition = mathzone}
   ),
   
+
+  
   s(
-  { trig="([^%a])sup([^%a])", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  { trig="([^%a])ll", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   { 
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip) return snip.captures[1] end),
+    t("\\inf"),
+    },
+  {condition = mathzone}
+  ),
+  
+  s(
+  { trig="([^%a]?)sup([^%a])", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  { 
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1] 
+      else
+        return ""
+      end
+    end ),
     t("\\sup"),
     f( function(_, snip) return snip.captures[2] end ),
     },
@@ -48,9 +79,15 @@ return{
   ),
 
   s(
-  { trig="([^%a])lsup", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  { trig="([^%a]?)lsup", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1] 
+      else
+        return ""
+      end
+    end ),
     t("\\limsup")
     },
   {condition = mathzone}
@@ -65,9 +102,15 @@ return{
     {condition = mathzone}
   ),
   s(
-  {trig="([^%a])ceil",wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)ceil",wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1] 
+      else
+        return ""
+      end
+    end ),
     t("\\lceil"), i(1), t("\\rceil"), i(0)
     },
     {condition = mathzone}
@@ -75,36 +118,60 @@ return{
 -- TODO add product
 
   s(
-  {trig="([^%a])sin",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)sin",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1] 
+      else
+        return ""
+      end
+    end ),
     t("\\sin")
     },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])cos",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)cos",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1] 
+      else
+        return ""
+      end
+    end ),
     t("\\cos")
     },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])tan",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)tan",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1] 
+      else
+        return ""
+      end
+    end ),
     t("\\tan ")
     },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])arcsin",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)arcsin",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\arcsin ")
     },
   {condition = mathzone}
@@ -112,64 +179,105 @@ return{
 
 
   s(
-  {trig="([^%a])arctan",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)arctan",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1] 
+      else
+        return ""
+      end
+    end ),
     t("\\arctan ")
     },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])csc",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)csc",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\csc")
     },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])log",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)log",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\log")
     },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])ln",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)ln",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   { 
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\ln")
     },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])sinh",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)sinh",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\sinh ")
     },
   {condition = mathzone}
   ),
 
-
   s(
-  {trig="([^%a])cosh",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)cosh",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\cosh ")
     },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])tanh",wordTrig=false, regTrig=true, snippetType="autosnippet"}, 
+  {trig="([^%a]?)tanh",wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\tanh ")
     },
   {condition = mathzone}
@@ -188,7 +296,7 @@ return{
         return sn(nil, {t("\\sqrt["), t(capture .. "] {"), i(1), t("} "), i(0)})
 
       else
-        return sn(nil, {t("\\sqrt{"), i(1), t("}"), i(0)})
+        return sn(nil, {t(capture), t("\\sqrt{"), i(1), t("}"), i(0)})
 
       end
     end)
@@ -206,17 +314,30 @@ return{
   ),
 	
   s(
-	{trig="([^%a])abs", snippetType="autosnippet"},
+	{trig="([^%a]?)abs", regTrig=true, wordTrig=false, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\abs{"), i(1), t("}"), i(0)
   },
     {condition = mathzone}
 	),
   
   s(
-	{trig="([^%a])norm", snippetType="autosnippet"},
+	{trig="([^%a]?)norm", regTrig=true, wordTrig=false, snippetType="autosnippet"},
 	{
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+     end),
     t("\\norm{"), i(1), t("}"), i(0)
   },
   {condition = mathzone}
@@ -235,54 +356,106 @@ return{
   s(
   {trig="([^%a])re", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-  f( function(_, snip) return snip.captures[1] end ),
-  t("\\operatorname{Re}"), i(1)
+    f( function(_, snip)
+        return snip.captures[1]
+    end ),
+    t("\\operatorname{Re}"), i(1)
   },
   {condition = mathzone}
   ),	
 
 
   s(
-  {trig="([^%a])ker", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)ker", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\operatorname{ker}("), i(1), t(")"), i(0)
   },
   {condition = mathzone}
   ),	
 
   s(
-  {trig="([^%a])range", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)range", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\text{ran }("), i(1), t(")"), i(0)
   },
   {condition = mathzone}
   ),	
 
   s(
-  {trig="([^%a])dim", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)dim", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\dim")
   },
   {condition = mathzone}
   ),	
 
   s(
-  {trig="([^%a])det", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a]?)det", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-    f( function(_, snip) return snip.captures[1] end ),
+    f( function(_, snip)
+      if snip.captures[1] ~= nil then
+        return snip.captures[1]
+      else
+        return ""
+      end
+    end ),
     t("\\operatorname{det}("), i(1), t(")"), i(0)
   },
   {condition = mathzone}
   ),
 
   s(
-  {trig="([^%a])tr", wordTrig=false, regTrig=true, snippetType="autosnippet"},
+  {trig="([^%a])trace", wordTrig=false, regTrig=true, snippetType="autosnippet"},
   {
-  f( function(_, snip) return snip.captures[1] end ),
-  t("\\operatorname{tr}"), i(1), i(0)
+    f( function(_, snip)
+        return snip.captures[1]
+    end ),
+    t("\\operatorname{tr}"), i(1), i(0)
+  },
+  {condition = mathzone}
+  ),
+  
+  s(
+  {trig="PDF", wordTrig=false, regTrig=true, snippetType="autosnippet", 
+  description="probability density function"},
+  {
+    t("f_{"), i(1), t("}"), t("("), 
+    f(function(args)
+      local input = args[1][1]
+      return string.lower(input)
+    end, {1}
+    ),
+    t("; "), i(2), t(")"), i(0)
+  },
+  {condition = mathzone}
+  ),
+  
+  s(
+  {trig="EE", wordTrig=false, regTrig=true, snippetType="autosnippet",
+  description="exponential"},
+  {
+      t("\\operatorname{exp}\\curlybk{"), i(1), t("}")
   },
   {condition = mathzone}
   ),

@@ -89,6 +89,8 @@ lspconfig.html.setup{
   capabilities = capabilities,
 }
 
+--lspconfig.ccls.setup{}
+
 lspconfig.lua_ls.setup{
   on_attach = function()
   vim.keymap.set("n", "I", vim.lsp.buf.hover, {buffer=0})

@@ -16,7 +16,7 @@ local fmta =  require("luasnip.extras.fmt").fmta
 return {
   s(
   {trig="section", snippetType="autosnippet"},
-  {t("\\section{"), i(1), t("}")},
+  {t("\\section*{"), i(1), t("}")},
   {condition = line_start(8)}
   ),
 
@@ -48,7 +48,7 @@ return {
   ),
 
   s(
-  {trig="pf", snippetType="autosnippet"},
+  {trig=">pf", snippetType="autosnippet"},
   fmta(
   [[
   \pf{<>}{
@@ -60,7 +60,7 @@ return {
       i(2)
   }
   ),
-  {condition = line_start(3)}
+  {condition = line_start(4)}
   ),
 
   s(
@@ -76,7 +76,7 @@ return {
   ),
 
   s(
-  {trig="def", snippetType="autosnippet", wordTrig=true, regTrig=false},
+  {trig=">def", snippetType="autosnippet", wordTrig=true, regTrig=false},
   fmta(
   [[
   \defin{<>}{
@@ -85,11 +85,11 @@ return {
   ]],
   {i(1),i(2)}
   ),
-  {condition = line_start(4)}
+  {condition = line_start(5)}
   ),
 	
   s(
-  {trig="coro", snippetType="autosnippet", wordTrig=true, regTrig=false},
+  {trig=">coro", snippetType="autosnippet", wordTrig=true, regTrig=false},
   fmta(
   [[
   \corollary{<>}{
@@ -98,11 +98,11 @@ return {
   ]],
 	{i(1),i(2)}
 	),
-	{condition = line_start(5)}
+	{condition = line_start(6)}
 	),
 
   s(
-  {trig="qs", snippetType="autosnippet", wordTrig=true, regTrig=false},
+  {trig=">qs", snippetType="autosnippet", wordTrig=true, regTrig=false},
   fmta(
   [[
   \qs{}{
@@ -111,11 +111,11 @@ return {
   ]],
   {i(1)}
   ),
-  {condition = line_start(3)}
+  {condition = line_start(4)}
   ),
 
   s(
-  {trig="aeq", snippetType="autosnippet", wordTrig=true, regTrig=false},
+  {trig=">aeq", snippetType="autosnippet", wordTrig=true, regTrig=false},
   fmta(
   [[
   \begin{align*}
@@ -125,13 +125,14 @@ return {
   ]],
   { i(1), i(2), i(3), i(4)}
   ),
-  {condition = line_begin}
+  {condition = not_mathzone}
   ),
-  s(
-  {trig="N", snippetType="autosnippet", wordTrig=true, regTrig=false},
-  {i(1), t(" & "), i(2), t("\\")},
-  {condition = helper.is_inside("align")}
-  ),
+
+--  s(
+--  {trig="N", snippetType="autosnippet", wordTrig=true, regTrig=false},
+--  {i(1), t(" & "), i(2), t("\\\\")},
+--  {condition = helper.is_inside("align")}
+--  ),
 
 --  s(
 --  {trig="N", snippetType="autosnippet", wordTrig=true, regTrig=false},
@@ -150,7 +151,7 @@ return {
 --  ),
 
   s(
-	{trig="ans", snippetType="autosnippet", wordTrig=true, regTrig=false},
+	{trig=">ans", snippetType="autosnippet", wordTrig=true, regTrig=false},
 	fmta(
 	[[
   \an{}{
@@ -159,11 +160,11 @@ return {
 	]],
 	{i(1)}
 	),
-	{condition = line_start(4)}
+	{condition = line_start(5)}
 	),
 
   s(
-	{trig="lem", snippetType="autosnippet", wordTrig=true, regTrig=false},
+	{trig=">lem", snippetType="autosnippet", wordTrig=true, regTrig=false},
 	fmta(
 	[[
   \lemma{<>}{
@@ -172,11 +173,11 @@ return {
 	]],
 	{i(1),i(2)}
 	),
-	{condition = line_start(4)}
+	{condition = line_start(5)}
 	),
   
   s(
-	{trig="prop", snippetType="autosnippet", wordTrig=true, regTrig=false},
+	{trig=">prop", snippetType="autosnippet", wordTrig=true, regTrig=false},
 	fmta(
 	[[
   \proposition{<>}{
@@ -185,11 +186,11 @@ return {
 	]],
 	{i(1),i(2)}
 	),
-	{condition = line_start(5)}
+	{condition = line_start(6)}
 	),
 	
   s(
-	{trig="ex", snippetType="autosnippet", wordTrig=true, regTrig=false},
+	{trig=">ex", snippetType="autosnippet", wordTrig=true, regTrig=false},
 	fmta(
 	[[
   \ex{<>}{
@@ -198,11 +199,11 @@ return {
 	]],
 	{i(1),i(2)}
 	),
-	{condition = line_start(3)}
+	{condition = line_start(4)}
 	),
 
 	s(
-	{trig="theo", snippetType="autosnippet"},
+	{trig=">theo", snippetType="autosnippet"},
 	fmta(
 	[[
   \theo{<>}{
@@ -211,12 +212,38 @@ return {
 	]],
 	{i(1), i(2)}
 	),
+	{condition = line_start(6)}
+	),
+
+	s(
+	{trig=">sol", snippetType="autosnippet"},
+	fmta(
+	[[
+  \solution{<>}{
+  <>
+  }
+	]],
+	{i(1), i(2)}
+	),
 	{condition = line_start(5)}
+	),
+
+	s(
+	{trig=">prob", snippetType="autosnippet"},
+	fmta(
+	[[
+  \problem{<>}{
+  <>
+  }
+	]],
+	{i(1), i(2)}
+	),
+	{condition = line_start(6)}
 	),
 
 
 	s(
-	{trig="eq", snippetType="autosnippet"}, 
+	{trig=">eq", snippetType="autosnippet"}, 
 	fmta(
 	[[
   \begin{equation*}
@@ -227,16 +254,16 @@ return {
 		i(1),
 	}
 	),
-	{condition = line_begin}
+	{condition = not_mathzone}
 	),
 
 	s(
 	{trig="list", snippetType="autosnippet"}, 
 	fmta(
 	[[
-  \mylist{
-    \item <>
-  }
+  \begin{enumerate}
+  <>
+  \end{enumerate}
 	]],
 	{i(1)}
 	),
@@ -306,13 +333,6 @@ return {
 --]]
 
     
-	s(
-	{trig="break", snippetType="autosnippet"},
-	{
-    t("\\bigbreak "), t("\\noindent")
-  }
-	),
-
 	s(
 	{trig="textbf", snippetType="autosnippet"},
 	{
