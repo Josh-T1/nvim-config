@@ -37,6 +37,8 @@ Plug 'nvim-treesitter/nvim-treesitter'
 --Plug 'vim-scripts/AutoComplPop'
 -- R Plugins
 Plug 'jalvesaq/Nvim-R'
+-- java language server plugin
+Plug 'mfussenegger/nvim-jdtls'
 vim.call('plug#end')
 
 vim.cmd('syntax on')
@@ -57,6 +59,8 @@ vim.opt.number = true
 vim.opt.splitright = true
 -- Prevent text from wrapping
 vim.opt.wrap = false
+-- Relative line numbers
+vim.opt.relativenumber = true
 -- vim.optting invisible character representations
 vim.opt.listchars = {trail = '~'}
 -- vim highlights text that will be subsituted but does not split window to preview
